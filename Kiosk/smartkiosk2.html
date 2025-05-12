@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart E-Waste Kiosk</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <style>
+    html, body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e3f2fd;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #0d47a1;
+      color: white;
+      padding: 6px 12px;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+    .container {
+      flex: 1;
+      max-width: 1000px;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    #webcam-container {
+      display: flex;
+      justify-content: center;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+    #label-container {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1565c0;
+      text-align: center;
+    }
+    #disposal-instruction {
+      display: none;
+      flex-grow: 1;
+      overflow-y: auto;
+      color: #1b5e20;
+      background-color: #e8f5e9;
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      max-height: 250px;
+      font-size: 0.9rem;
+    }
+    video {
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .spinner {
+      border: 4px solid #bbdefb;
+      border-top: 4px solid #1565c0;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="font-size: 1.3rem; margin: 4px 0;">Smart E-Waste Detection Kiosk</h1>
+    <p style="font-size: 0.9rem; margin: 0;">Not sure what to do with your old device? Scan to find out.</p>
+  </header>
+  <div class="container">
+    <div id="webcam-container"></div>
+    <div class="spinner" id="loading-spinner"></div>
+    <div id="label-container">Loading model...</div>
+    <div id="disposal-instruction"></div>
+  </div>
+
+  <script>
+    const URL = "https://teachablemachine.withgoogle.com/models/mVZNxnBcE/";
+    let model, webcam, labelContainer, maxPredictions;
+
+    const instructions = {
+      "Laptop": `Give & Empower ❤️\nWorking laptops go to Carlton Local Agencies Network (CLAN) to bridge the digital divide. Secure data-wipe provided; you will get a donation certificate.\n\nWipe & Watch 🔐\nBackup ➜ Factory reset ➜ Remove SIM/eSIM ➜ Sign-out of services. Need a guide? Tap to watch 60-sec iOS & Android how-tos.\n\nRepair First 🛠️\nMinor screen crack or slow battery? Book a free diagnosis session at the Repair Café of Telstra Creator Space (future development).\n\nTrade & Earn 💲\nTurn your device into cash or campus credit on SecondByte/NextUse/CircuIT – UniMelb’s Official E-waste Marketplace.`,
+
+      "Phone": `Post it Free 📦\nGrab a free MobileMuster satchel at AusPost, drop it in any red box, and 95% of materials get recovered – 9 million Aussies already do it.\n\nQuick Drop 🚮\nTap for a map to the nearest authorized e-waste bin (e.g. Baillieu Library foyer). Receipt emailed for sustainability points.\n\nWipe & Watch 🔐\nBackup ➜ Factory reset ➜ Remove SIM/eSIM ➜ Sign-out of services.\n\nRepair First 🛠️\nBook a free diagnosis at the Repair Café (coming soon).`,
+
+      "Battery": `Quick Drop 🚮\nUse the red battery bin near Union House.\n\nOfficeworks Bring-IT-Back 🛍️\nHand your old batteries to Officeworks service desk for free, safe disposal.`,
+
+      "Cable": `Trade & Earn 💲\nList your cable on SecondByte/NextUse/CircuIT to give it another life.\n\nOfficeworks Bring-IT-Back 🛍️\nDrop off cables and accessories at any Officeworks store.`
+    };
+
+    async function init() {
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
+
+      const flip = true;
+      webcam = new tmImage.Webcam(200, 200, flip);
+      await webcam.setup();
+      await webcam.play();
+      window.requestAnimationFrame(loop);
+
+      document.getElementById("webcam-container").appendChild(webcam.canvas);
+      labelContainer = document.getElementById("label-container");
+      document.getElementById("loading-spinner").style.display = "none";
+    }
+
+    async function loop() {
+      webcam.update();
+      await predict();
+      window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+      const prediction = await model.predict(webcam.canvas);
+      prediction.sort((a, b) => b.probability - a.probability);
+      const top = prediction[0];
+      const box = document.getElementById("disposal-instruction");
+      if (top.probability < 0.8) {
+        labelContainer.innerHTML = "Unrecognised device";
+        box.innerText = "Please try again or adjust the position of the item.";
+        box.style.display = "block";
+      } else {
+        labelContainer.innerHTML = `Detected: ${top.className}`;
+        box.innerText = instructions[top.className] || "No disposal info available.";
+        box.style.display = "block";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
