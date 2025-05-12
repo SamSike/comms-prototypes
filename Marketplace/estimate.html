@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quick Estimate - UniGadget</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #F0F3F8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #00205B;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #00205B;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #0055A5;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #003F88;
+    }
+    .result-box {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e0f0ff;
+      border-left: 5px solid #0055A5;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+  <script>
+    function estimatePrice() {
+      document.getElementById('result').style.display = 'block';
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Quick Price Estimate</h1>
+  </header>
+  <div class="container">
+    <h2>Fill in to get a rough price range</h2>
+    <label for="name">Device Name</label>
+    <input type="text" id="name" placeholder="e.g., iPhone 12 Mini" />
+
+    <label for="model">Model / Specs</label>
+    <input type="text" id="model" placeholder="e.g., 64GB, Black" />
+
+    <label for="screen">Screen Condition</label>
+    <select id="screen">
+      <option>No visible scratches</option>
+      <option>Minor scratches</option>
+      <option>Moderate scratches</option>
+      <option>Heavy scratches</option>
+    </select>
+
+    <label for="function">Functionality</label>
+    <select id="function">
+      <option>Fully Functional</option>
+      <option>Some minor issues</option>
+      <option>Not fully functional</option>
+    </select>
+
+    <label for="battery">Battery Health</label>
+    <select id="battery">
+      <option>Above 90%</option>
+      <option>80%-90%</option>
+      <option>Below 80%</option>
+    </select>
+
+    <button onclick="estimatePrice()">Estimate</button>
+
+    <div class="result-box" id="result">
+      <strong>Estimated Price:</strong> ¥200 – ¥280<br />
+      This is a rough estimate based on your input.
+    </div>
+  </div>
+</body>
+</html>

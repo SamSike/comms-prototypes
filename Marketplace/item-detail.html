@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Item Detail - UniGadget</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #F9FAFB;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #00205B;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .images {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .images img {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 10px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00205B;
+    }
+    .price-box {
+      margin: 10px 0;
+      color: #333;
+    }
+    .rating-section, .info-section, .specs-section, .interaction {
+      margin: 20px 0;
+    }
+    .rating-grid {
+      display: flex;
+      gap: 20px;
+    }
+    .rating-item {
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .interaction button {
+      padding: 10px 20px;
+      background: #0055A5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .interaction button:hover {
+      background: #003F88;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Product Detail</h1>
+  </header>
+  <div class="container">
+    <div class="images">
+      <img src="https://via.placeholder.com/250" alt="Device Front" />
+      <img src="https://via.placeholder.com/250" alt="Device Back" />
+    </div>
+    <div class="title">iPhone 12 Mini - 64GB</div>
+    <div class="price-box">
+      <p><strong>Original Price:</strong> ¥5200</p>
+      <p><strong>Seller's Price:</strong> ¥180</p>
+    </div>
+    <div class="rating-section">
+      <div class="rating-grid">
+        <div class="rating-item"><strong>Appearance:</strong> 90% New</div>
+        <div class="rating-item"><strong>Function:</strong> Fully Functional</div>
+        <div class="rating-item"><strong>Battery:</strong> 83%</div>
+        <div class="rating-item"><strong>Warranty:</strong> No Warranty</div>
+      </div>
+    </div>
+    <div class="specs-section">
+      <h3>Specifications</h3>
+      <ul>
+        <li>Brand: Apple</li>
+        <li>Model: iPhone 12 Mini</li>
+        <li>Color: Black</li>
+        <li>Storage: 64GB</li>
+        <li>OS: iOS 16.3</li>
+      </ul>
+    </div>
+    <div class="info-section">
+      <p><strong>Description:</strong> Lightly used iPhone 12 mini with minor scratches on the back. Fully functional and in good condition. Charger included.</p>
+    </div>
+    <div class="interaction">
+      <button>⭐ Add to Favorites (23 users)</button>
+      <button style="margin-left:10px;">💬 Contact Seller</button>
+    </div>
+  </div>
+</body>
+</html>
