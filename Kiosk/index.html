@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart E-Waste Kiosk</title>
+  <title>Scan-a-Scrap @ Uni</title>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
   <style>
@@ -40,6 +40,7 @@
       gap: 10px;
       box-sizing: border-box;
       overflow: hidden;
+      align-items: center;
     }
     #webcam-container {
       display: flex;
@@ -85,75 +86,171 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    #scan-btn, #reset-btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #countdown {
+      font-size: 1.1rem;
+      color: #333;
+      margin-top: 10px;
+    }
+    #reset-btn + #label-container {
+        margin-top: 4px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1 style="font-size: 1.3rem; margin: 4px 0;">Smart E-Waste Detection Kiosk</h1>
+    <h1 style="font-size: 1.3rem; margin: 4px 0;">Scan-a-Scrap @ Uni</h1>
     <p style="font-size: 0.9rem; margin: 0;">Not sure what to do with your old device? Scan to find out.</p>
   </header>
   <div class="container">
     <div id="webcam-container"></div>
     <div class="spinner" id="loading-spinner"></div>
     <div id="label-container">Loading model...</div>
+    <button id="scan-btn" onclick="startCountdown()">Start Scan</button>
+    <div id="countdown"></div>
+    <button id="reset-btn" onclick="resetScan()" style="display:none; margin-bottom: 0px;">Scan Again</button>
     <div id="disposal-instruction"></div>
   </div>
-
   <script>
-    const URL = "https://teachablemachine.withgoogle.com/models/mVZNxnBcE/";
-    let model, webcam, labelContainer, maxPredictions;
+  const URL = "https://teachablemachine.withgoogle.com/models/UQ3UWI5kg/";
+  let model, webcam, labelContainer, maxPredictions;
+let streamLoop = null;
 
-    const instructions = {
-      "Laptop": `Give & Empower ❤️\nWorking laptops go to Carlton Local Agencies Network (CLAN) to bridge the digital divide. Secure data-wipe provided; you will get a donation certificate.\n\nWipe & Watch 🔐\nBackup ➜ Factory reset ➜ Remove SIM/eSIM ➜ Sign-out of services. Need a guide? Tap to watch 60-sec iOS & Android how-tos.\n\nRepair First 🛠️\nMinor screen crack or slow battery? Book a free diagnosis session at the Repair Café of Telstra Creator Space (future development).\n\nTrade & Earn 💲\nTurn your device into cash or campus credit on SecondByte/NextUse/CircuIT – UniMelb’s Official E-waste Marketplace.`,
+  const instructions = {
+    "Laptop": `🛍️ <u>UniMarketplace</u>  
+List your device on the University's official E-waste Marketplace, <strong>Unibyte</strong>, and schedule secure on-campus pickup with fellow University members.  
+<div id=\"qr-placeholder\"></div>
+\
+🚮 <u>Drop-off Locations (UniMelb & Local)</u>  
+Have a broken device? Drop it off at one of these nearby e-waste drop-off facilities:
+• Telstra Creator Space – Parkville Campus  
+• Kathleen Syme Library – 251 Faraday St, Carlton  
+• Dynon Rd Waste & Recycling Centre – 437 Dynon Rd, West Melbourne  
+• Library at The Dock – 107 Victoria Harbour Promenade
 
-      "Phone": `Post it Free 📦\nGrab a free MobileMuster satchel at AusPost, drop it in any red box, and 95% of materials get recovered – 9 million Aussies already do it.\n\nQuick Drop 🚮\nTap for a map to the nearest authorized e-waste bin (e.g. Baillieu Library foyer). Receipt emailed for sustainability points.\n\nWipe & Watch 🔐\nBackup ➜ Factory reset ➜ Remove SIM/eSIM ➜ Sign-out of services.\n\nRepair First 🛠️\nBook a free diagnosis at the Repair Café (coming soon).`,
+❤️ <u>Donate Your Laptop</u>  
+Working laptops can be donated to the <strong>Carlton Local Agencies Network (CLAN)</strong> to support local communities and reduce digital inequality.
 
-      "Battery": `Quick Drop 🚮\nUse the red battery bin near Union House.\n\nOfficeworks Bring-IT-Back 🛍️\nHand your old batteries to Officeworks service desk for free, safe disposal.`,
+💡 <u>Did you know?</u>  
+The average laptop contains valuable metals like gold, copper, and palladium — and recycling just 1 million laptops saves the energy equivalent of powering over 3,500 homes for a year.`,
+   
+"Phone": `🔁 <u>Trade & Earn</u>  
+List your device on UniMelb’s official e-waste marketplace, <strong>Unibyte</strong>, and schedule secure on-campus pickup with fellow University members.   
+<div id=\"qr-placeholder\"></div>
+\
+🚮 <u>Drop-off Locations</u>  
+Have a broken device? Drop it off at one of these nearby e-waste drop-off facilities:
+• Telstra Creator Space: Parkville Campus  
+• Kathleen Syme Library: 251 Faraday St, Carlton  
+• Dynon Rd Waste & Recycling Centre: 437 Dynon Rd, West Melbourne  
+• Officeworks Melbourne (3 locations):  
+  - 461 Bourke St  
+  - 107 Elizabeth St  
+  - QV Centre, Russell St
 
-      "Cable": `Trade & Earn 💲\nList your cable on SecondByte/NextUse/CircuIT to give it another life.\n\nOfficeworks Bring-IT-Back 🛍️\nDrop off cables and accessories at any Officeworks store.`
-    };
+❤️ <u>Donate Your Phone</u>  
+Post it free with <strong>MobileMuster</strong> — grab a prepaid satchel from any AusPost and drop it in a red post box.
 
-    async function init() {
-      const modelURL = URL + "model.json";
-      const metadataURL = URL + "metadata.json";
+💡 <u>Did you know?</u>  
+Over 23 million unused phones are sitting in Australian drawers. Recycling them properly could recover over 2,200 tonnes of materials — enough to build 110 electric vehicles.`,
+    
+  };
 
-      model = await tmImage.load(modelURL, metadataURL);
-      maxPredictions = model.getTotalClasses();
+  async function init() {
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
 
-      const flip = true;
-      webcam = new tmImage.Webcam(200, 200, flip);
-      await webcam.setup();
-      await webcam.play();
-      window.requestAnimationFrame(loop);
+    model = await tmImage.load(modelURL, metadataURL);
+    maxPredictions = model.getTotalClasses();
 
-      document.getElementById("webcam-container").appendChild(webcam.canvas);
-      labelContainer = document.getElementById("label-container");
-      document.getElementById("loading-spinner").style.display = "none";
-    }
+    const flip = true;
+    webcam = new tmImage.Webcam(200, 200, flip);
+    await webcam.setup();
+    await webcam.play();
+    startStreamLoop();
 
-    async function loop() {
-      webcam.update();
-      await predict();
-      window.requestAnimationFrame(loop);
-    }
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+    labelContainer = document.getElementById("label-container");
+    document.getElementById("loading-spinner").style.display = "none";
+    document.getElementById("label-container").innerText = "Ready to scan";
+  }
 
-    async function predict() {
-      const prediction = await model.predict(webcam.canvas);
-      prediction.sort((a, b) => b.probability - a.probability);
-      const top = prediction[0];
-      const box = document.getElementById("disposal-instruction");
-      if (top.probability < 0.8) {
-        labelContainer.innerHTML = "Unrecognised device";
-        box.innerText = "Please try again or adjust the position of the item.";
-        box.style.display = "block";
+  async function startCountdown() {
+    let countdown = 5;
+    document.getElementById("scan-btn").style.display = "none";
+    const countdownDiv = document.getElementById("countdown");
+    countdownDiv.innerText = `Scanning in ${countdown}...`;
+
+    const interval = setInterval(() => {
+      countdown--;
+      if (countdown > 0) {
+        countdownDiv.innerText = `Scanning in ${countdown}...`;
       } else {
-        labelContainer.innerHTML = `Detected: ${top.className}`;
-        box.innerText = instructions[top.className] || "No disposal info available.";
-        box.style.display = "block";
+        clearInterval(interval);
+        countdownDiv.innerText = "Scanning...";
+        capturePrediction();
       }
-    }
+    }, 1000);
+  }
 
-    init();
+  async function capturePrediction() {
+    stopStreamLoop();
+    webcam.update();
+    const prediction = await model.predict(webcam.canvas);
+    prediction.sort((a, b) => b.probability - a.probability);
+    const top = prediction[0];
+    const box = document.getElementById("disposal-instruction");
+
+    if (top.probability < 0.92) {
+      labelContainer.innerHTML = "Unrecognised device";
+      box.innerText = "Please try again or adjust the position of the item.";
+      box.style.display = "block";
+    } else {
+      labelContainer.innerHTML = `Detected: ${top.className} (${(top.probability * 100).toFixed(1)}%)`;
+      box.innerHTML = instructions[top.className] || "No disposal info available.";
+      if (top.className === "Laptop" || top.className === "Phone") {
+        const qrContainer = box.querySelector("#qr-placeholder");
+        if (qrContainer) {
+          qrContainer.outerHTML = '<div style="text-align: center; margin-top: 10px;"><a href="https://comms-prototypes.vercel.app/" target="_blank"><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://comms-prototypes.vercel.app/" alt="QR Code"></a><div style="font-size: 0.8rem; color: #444; margin-top: 4px;">Scan to visit Unibyte 📲</div></div>';
+        }
+      }
+      box.style.display = "block";
+    }
+    document.getElementById("reset-btn").style.display = "inline-block";
+    document.getElementById("countdown").innerText = "";
+  }
+
+  function resetScan() {
+    document.getElementById("disposal-instruction").style.display = "none";
+    document.getElementById("label-container").innerText = "Ready to scan again.";
+    document.getElementById("scan-btn").style.display = "inline-block";
+    document.getElementById("reset-btn").style.display = "none";
+    document.getElementById("countdown").innerText = "";
+    startStreamLoop();
+}
+
+  init();
+
+  function startStreamLoop() {
+    if (streamLoop) cancelAnimationFrame(streamLoop);
+    const loop = async () => {
+      webcam.update();
+      streamLoop = requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
+  function stopStreamLoop() {
+    if (streamLoop) cancelAnimationFrame(streamLoop);
+  }
   </script>
 </body>
 </html>
