@@ -1,31 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home - Unibyt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - Unibyte</title>
   <style>
-  /* Interactive Enhancements */
-  .button:hover, button:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease-out;
-  }
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-  }
-  .loading {
-    display: none;
-    margin-top: 10px;
-    font-size: 14px;
-    color: #888;
-    animation: blink 1s infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+    /* Interactive Enhancements */
+    .button:hover,
+    button:hover {
+      transform: scale(1.05);
+      transition: transform 0.2s ease-out;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #888;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
 
     body {
       font-family: Arial, sans-serif;
@@ -33,29 +45,34 @@
       margin: 0;
       padding: 0;
     }
+
     header {
       background-color: #00205B;
       color: white;
       padding: 16px;
       text-align: center;
     }
+
     .nav-bar {
       background: white;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     .nav-bar a {
       text-decoration: none;
       color: #00205B;
       font-weight: bold;
     }
+
     .search-container {
       display: flex;
       justify-content: center;
       margin: 20px;
     }
+
     .search-container input {
       width: 60%;
       padding: 10px;
@@ -63,43 +80,56 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-    .categories, .filters, .products {
+
+    .categories,
+    .filters,
+    .products {
       margin: 20px;
     }
+
     .section-title {
       font-weight: bold;
       font-size: 18px;
       color: #00205B;
       margin-bottom: 10px;
     }
-    .category-grid, .product-grid {
+
+    .category-grid,
+    .product-grid {
       display: flex;
       flex-wrap: wrap;
       gap: 16px;
     }
-    .category-box, .product-card {
+
+    .category-box,
+    .product-card {
       background: white;
       padding: 12px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       flex: 1 1 calc(25% - 32px);
       text-align: center;
       cursor: pointer;
     }
-    .category-box:hover, .product-card:hover {
+
+    .category-box:hover,
+    .product-card:hover {
       background: #e9f1ff;
     }
+
     .product-card img {
       width: 100%;
       height: auto;
       border-radius: 8px;
     }
+
     .filter-panel {
       background: white;
       padding: 16px;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     .sell-button {
       position: fixed;
       bottom: 20px;
@@ -112,17 +142,20 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
     .sell-button:hover {
       background: #e64a19;
     }
   </style>
 </head>
+
 <body>
   <header>
-    <h1>Unibyt</h1>
-    <p>Unibyt is Uni’s official e-waste platform for students and staff to trade, donate, or repurpose smartphones, tablets, and laptops.</p>
+    <h1>Unibyte</h1>
+    <p>Unibyte is Uni’s official e-waste platform for students and staff to trade, donate, or repurpose smartphones,
+      tablets, and laptops.</p>
   </header>
   <div class="nav-bar">
     <a href="home.html">Home</a>
@@ -177,4 +210,5 @@
   </div>
   <button class="sell-button" onclick="location.href='sell.html'">Sell Used Item</button>
 </body>
+
 </html>
