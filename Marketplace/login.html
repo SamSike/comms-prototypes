@@ -2,8 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login - UniGadget</title>
+  <title>Login - Unibyt</title>
   <style>
+  /* Interactive Enhancements */
+  .button:hover, button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-out;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  .loading {
+    display: none;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(to right, #00205B, #0055A5);
@@ -47,7 +69,7 @@
 </head>
 <body>
   <div class="login-container">
-    <h2>Welcome to UniGadget</h2>
+    <h2>Welcome to Unibyt</h2>
     <input type="text" placeholder="Student ID" />
     <input type="password" placeholder="Password" />
     <button onclick="location.href='home.html'">Login</button>

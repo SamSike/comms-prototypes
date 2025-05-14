@@ -5,6 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Item Detail - UniGadget</title>
   <style>
+  /* Interactive Enhancements */
+  .button:hover, button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-out;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  .loading {
+    display: none;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
     body {
       font-family: Arial, sans-serif;
       background: #F9FAFB;
@@ -81,8 +103,8 @@
     </div>
     <div class="title">iPhone 12 Mini - 64GB</div>
     <div class="price-box">
-      <p><strong>Original Price:</strong> ¥5200</p>
-      <p><strong>Seller's Price:</strong> ¥180</p>
+      <p><strong>Original Price:</strong> $5200</p>
+      <p><strong>Seller's Price:</strong> $180</p>
     </div>
     <div class="rating-section">
       <div class="rating-grid">

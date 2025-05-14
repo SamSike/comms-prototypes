@@ -3,8 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home - UniGadget</title>
+  <title>Home - Unibyt</title>
   <style>
+  /* Interactive Enhancements */
+  .button:hover, button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-out;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  .loading {
+    display: none;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
     body {
       font-family: Arial, sans-serif;
       background: #F2F5FA;
@@ -99,8 +121,8 @@
 </head>
 <body>
   <header>
-    <h1>UniGadget</h1>
-    <p>Melbourne Uni Second-hand Electronics Market</p>
+    <h1>Unibyt</h1>
+    <p>Unibyt is Uni’s official e-waste platform for students and staff to trade, donate, or repurpose smartphones, tablets, and laptops.</p>
   </header>
   <div class="nav-bar">
     <a href="home.html">Home</a>
@@ -125,7 +147,7 @@
     <div class="section-title">Filter Options</div>
     <div class="filter-panel">
       <p><strong>Condition:</strong> Excellent, Good, Fair</p>
-      <p><strong>Price:</strong> Under ¥100, ¥100–¥200, ¥200–¥300, Above ¥300</p>
+      <p><strong>Price:</strong> Under $100, $100–$200, $200–$300, Above $300</p>
     </div>
   </div>
   <div class="products">
@@ -134,22 +156,22 @@
       <div class="product-card" onclick="location.href='item-detail.html'">
         <img src="https://via.placeholder.com/150" alt="Phone" />
         <p>iPhone 12 Mini</p>
-        <p>¥180</p>
+        <p>$180</p>
       </div>
       <div class="product-card" onclick="location.href='item-detail.html'">
         <img src="https://via.placeholder.com/150" alt="Laptop" />
         <p>Dell XPS 13</p>
-        <p>¥350</p>
+        <p>$350</p>
       </div>
       <div class="product-card" onclick="location.href='item-detail.html'">
         <img src="https://via.placeholder.com/150" alt="Tablet" />
         <p>iPad 8th Gen</p>
-        <p>¥220</p>
+        <p>$220</p>
       </div>
       <div class="product-card" onclick="location.href='item-detail.html'">
         <img src="https://via.placeholder.com/150" alt="Headphones" />
         <p>Sony WH-1000XM3</p>
-        <p>¥150</p>
+        <p>$150</p>
       </div>
     </div>
   </div>
