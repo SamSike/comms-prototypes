@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,7 +8,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
   <style>
-    html, body {
+    html,
+    body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #e3f2fd;
       margin: 0;
@@ -17,15 +19,17 @@
       display: flex;
       flex-direction: column;
     }
+
     header {
       background-color: #0d47a1;
       color: white;
       padding: 6px 12px;
       text-align: center;
       width: 100%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       flex-shrink: 0;
     }
+
     .container {
       flex: 1;
       max-width: 1000px;
@@ -33,7 +37,7 @@
       background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       margin: auto;
       display: flex;
       flex-direction: column;
@@ -42,20 +46,24 @@
       overflow: hidden;
       align-items: center;
     }
+
     #webcam-container {
       display: flex;
       justify-content: center;
     }
+
     canvas {
       display: block;
       margin: 0 auto;
     }
+
     #label-container {
       font-size: 1.3rem;
       font-weight: 600;
       color: #1565c0;
       text-align: center;
     }
+
     #disposal-instruction {
       display: none;
       flex-grow: 1;
@@ -69,10 +77,12 @@
       max-height: 250px;
       font-size: 0.9rem;
     }
+
     video {
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
     .spinner {
       border: 4px solid #bbdefb;
       border-top: 4px solid #1565c0;
@@ -82,11 +92,19 @@
       animation: spin 1s linear infinite;
       margin: 10px auto;
     }
+
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
-    #scan-btn, #reset-btn {
+
+    #scan-btn,
+    #reset-btn {
       padding: 10px 20px;
       font-size: 1rem;
       background-color: #1565c0;
@@ -95,16 +113,19 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
     #countdown {
       font-size: 1.1rem;
       color: #333;
       margin-top: 10px;
     }
-    #reset-btn + #label-container {
-        margin-top: 4px;
+
+    #reset-btn+#label-container {
+      margin-top: 4px;
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1 style="font-size: 1.3rem; margin: 4px 0;">Smart E-waste Station @ Uni</h1>
@@ -120,12 +141,12 @@
     <div id="disposal-instruction"></div>
   </div>
   <script>
-  const URL = "https://teachablemachine.withgoogle.com/models/UQ3UWI5kg/";
-  let model, webcam, labelContainer, maxPredictions;
-let streamLoop = null;
+    const URL = "https://teachablemachine.withgoogle.com/models/UQ3UWI5kg/";
+    let model, webcam, labelContainer, maxPredictions;
+    let streamLoop = null;
 
-  const instructions = {
-    "Laptop": `🛍️ <u>UniMarketplace</u>  
+    const instructions = {
+      "Laptop": `🛍️ <u>UniMarketplace</u>  
 List your device on the University's official E-waste Marketplace, <strong>Unibyte</strong>, and schedule secure on-campus pickup with fellow University members.  
 <div id=\"qr-placeholder\"></div>
 \
@@ -141,8 +162,8 @@ Working laptops can be donated to the <strong>Carlton Local Agencies Network (CL
 
 💡 <u>Did you know?</u>  
 The average laptop contains valuable metals like gold, copper, and palladium — and recycling just 1 million laptops saves the energy equivalent of powering over 3,500 homes for a year.`,
-   
-"Phone": `🔁 <u>Trade & Earn</u>  
+
+      "Phone": `🔁 <u>Trade & Earn</u>  
 List your device on UniMelb’s official e-waste marketplace, <strong>Unibyte</strong>, and schedule secure on-campus pickup with fellow University members.   
 <div id=\"qr-placeholder\"></div>
 \
@@ -161,96 +182,97 @@ Post it free with <strong>MobileMuster</strong> — grab a prepaid satchel from 
 
 💡 <u>Did you know?</u>  
 Over 23 million unused phones are sitting in Australian drawers. Recycling them properly could recover over 2,200 tonnes of materials — enough to build 110 electric vehicles.`,
-    
-  };
 
-  async function init() {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
-
-    model = await tmImage.load(modelURL, metadataURL);
-    maxPredictions = model.getTotalClasses();
-
-    const flip = true;
-    webcam = new tmImage.Webcam(200, 200, flip);
-    await webcam.setup();
-    await webcam.play();
-    startStreamLoop();
-
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
-    labelContainer = document.getElementById("label-container");
-    document.getElementById("loading-spinner").style.display = "none";
-    document.getElementById("label-container").innerText = "Ready to scan";
-  }
-
-  async function startCountdown() {
-    let countdown = 5;
-    document.getElementById("scan-btn").style.display = "none";
-    const countdownDiv = document.getElementById("countdown");
-    countdownDiv.innerText = `Scanning in ${countdown}...`;
-
-    const interval = setInterval(() => {
-      countdown--;
-      if (countdown > 0) {
-        countdownDiv.innerText = `Scanning in ${countdown}...`;
-      } else {
-        clearInterval(interval);
-        countdownDiv.innerText = "Scanning...";
-        capturePrediction();
-      }
-    }, 1000);
-  }
-
-  async function capturePrediction() {
-    stopStreamLoop();
-    webcam.update();
-    const prediction = await model.predict(webcam.canvas);
-    prediction.sort((a, b) => b.probability - a.probability);
-    const top = prediction[0];
-    const box = document.getElementById("disposal-instruction");
-
-    if (top.probability < 0.92) {
-      labelContainer.innerHTML = "Unrecognised device";
-      box.innerText = "Please try again or adjust the position of the item.";
-      box.style.display = "block";
-    } else {
-      labelContainer.innerHTML = `Detected: ${top.className} (${(top.probability * 100).toFixed(1)}%)`;
-      box.innerHTML = instructions[top.className] || "No disposal info available.";
-      if (top.className === "Laptop" || top.className === "Phone") {
-        const qrContainer = box.querySelector("#qr-placeholder");
-        if (qrContainer) {
-          qrContainer.outerHTML = '<div style="text-align: center; margin-top: 10px;"><a href="https://comms-prototypes.vercel.app/" target="_blank"><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://comms-prototypes.vercel.app/" alt="QR Code"></a><div style="font-size: 0.8rem; color: #444; margin-top: 4px;">Scan to visit Unibyte 📲</div></div>';
-        }
-      }
-      box.style.display = "block";
-    }
-    document.getElementById("reset-btn").style.display = "inline-block";
-    document.getElementById("countdown").innerText = "";
-  }
-
-  function resetScan() {
-    document.getElementById("disposal-instruction").style.display = "none";
-    document.getElementById("label-container").innerText = "Ready to scan again.";
-    document.getElementById("scan-btn").style.display = "inline-block";
-    document.getElementById("reset-btn").style.display = "none";
-    document.getElementById("countdown").innerText = "";
-    startStreamLoop();
-}
-
-  init();
-
-  function startStreamLoop() {
-    if (streamLoop) cancelAnimationFrame(streamLoop);
-    const loop = async () => {
-      webcam.update();
-      streamLoop = requestAnimationFrame(loop);
     };
-    loop();
-  }
 
-  function stopStreamLoop() {
-    if (streamLoop) cancelAnimationFrame(streamLoop);
-  }
+    async function init() {
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
+
+      const flip = true;
+      webcam = new tmImage.Webcam(200, 200, flip);
+      await webcam.setup();
+      await webcam.play();
+      startStreamLoop();
+
+      document.getElementById("webcam-container").appendChild(webcam.canvas);
+      labelContainer = document.getElementById("label-container");
+      document.getElementById("loading-spinner").style.display = "none";
+      document.getElementById("label-container").innerText = "Ready to scan";
+    }
+
+    async function startCountdown() {
+      let countdown = 5;
+      document.getElementById("scan-btn").style.display = "none";
+      const countdownDiv = document.getElementById("countdown");
+      countdownDiv.innerText = `Scanning in ${countdown}...`;
+
+      const interval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          countdownDiv.innerText = `Scanning in ${countdown}...`;
+        } else {
+          clearInterval(interval);
+          countdownDiv.innerText = "Scanning...";
+          capturePrediction();
+        }
+      }, 1000);
+    }
+
+    async function capturePrediction() {
+      stopStreamLoop();
+      webcam.update();
+      const prediction = await model.predict(webcam.canvas);
+      prediction.sort((a, b) => b.probability - a.probability);
+      const top = prediction[0];
+      const box = document.getElementById("disposal-instruction");
+
+      if (top.probability < 0.92) {
+        labelContainer.innerHTML = "Unrecognised device";
+        box.innerText = "Please try again or adjust the position of the item.";
+        box.style.display = "block";
+      } else {
+        labelContainer.innerHTML = `Detected: ${top.className} (${(top.probability * 100).toFixed(1)}%)`;
+        box.innerHTML = instructions[top.className] || "No disposal info available.";
+        if (top.className === "Laptop" || top.className === "Phone") {
+          const qrContainer = box.querySelector("#qr-placeholder");
+          if (qrContainer) {
+            qrContainer.outerHTML = '<div style="text-align: center; margin-top: 10px;"><a href="https://comms-prototypes.vercel.app/" target="_blank"><img src="./qr-code.png" alt="QR Code" width="120" height="120"></a><div style="font-size: 0.8rem; color: #444; margin-top: 4px;">Scan to visit Unibyte 📲</div></div>';
+          }
+        }
+        box.style.display = "block";
+      }
+      document.getElementById("reset-btn").style.display = "inline-block";
+      document.getElementById("countdown").innerText = "";
+    }
+
+    function resetScan() {
+      document.getElementById("disposal-instruction").style.display = "none";
+      document.getElementById("label-container").innerText = "Ready to scan again.";
+      document.getElementById("scan-btn").style.display = "inline-block";
+      document.getElementById("reset-btn").style.display = "none";
+      document.getElementById("countdown").innerText = "";
+      startStreamLoop();
+    }
+
+    init();
+
+    function startStreamLoop() {
+      if (streamLoop) cancelAnimationFrame(streamLoop);
+      const loop = async () => {
+        webcam.update();
+        streamLoop = requestAnimationFrame(loop);
+      };
+      loop();
+    }
+
+    function stopStreamLoop() {
+      if (streamLoop) cancelAnimationFrame(streamLoop);
+    }
   </script>
 </body>
+
 </html>
